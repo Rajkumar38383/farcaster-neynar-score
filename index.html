@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neynar Score Checker - Farcaster Reputation Tool</title>
+    <meta name="description" content="Check Neynar scores for any Farcaster user. Discover user reputation and engagement metrics.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-gradient"></div>
+    
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="14" stroke="url(#gradient)" stroke-width="2"/>
+                        <path d="M16 8L20 16L16 24L12 16L16 8Z" fill="url(#gradient)"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
+                                <stop offset="0%" stop-color="#8B5CF6"/>
+                                <stop offset="100%" stop-color="#EC4899"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h1>Neynar Score Checker</h1>
+            </div>
+            <button class="settings-btn" id="settingsBtn" title="API Settings">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M16.25 10C16.25 10.625 16.75 11.125 17.375 11.125C18 11.125 18.5 11.625 18.5 12.25V13.75C18.5 14.375 18 14.875 17.375 14.875C16.75 14.875 16.25 15.375 16.25 16C16.25 16.625 16.75 17.125 17.375 17.125C18 17.125 18.5 17.625 18.5 18.25V19.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </header>
+
+        <div class="hero">
+            <h2 class="hero-title">Discover Farcaster Reputation</h2>
+            <p class="hero-subtitle">Check the Neynar score for any Farcaster user and explore their profile metrics</p>
+        </div>
+
+        <div class="search-section">
+            <div class="search-container">
+                <div class="search-icon">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2"/>
+                        <path d="M13.5 13.5L17.5 17.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <input 
+                    type="text" 
+                    id="usernameInput" 
+                    class="search-input" 
+                    placeholder="Enter Farcaster username (e.g., dwr, v, neynar)"
+                    autocomplete="off"
+                >
+                <button class="search-btn" id="searchBtn">
+                    <span>Check Score</span>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="search-hint" id="searchHint">Press Enter to search</div>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <!-- Loading State -->
+            <div class="loading-state" id="loadingState">
+                <div class="spinner"></div>
+                <p>Fetching user data...</p>
+            </div>
+
+            <!-- Error State -->
+            <div class="error-state" id="errorState">
+                <div class="error-icon">⚠️</div>
+                <h3>Oops! Something went wrong</h3>
+                <p id="errorMessage">Unable to fetch user data. Please try again.</p>
+            </div>
+
+            <!-- Results -->
+            <div class="results" id="results">
+                <div class="score-card">
+                    <div class="score-header">
+                        <h3>Neynar Score</h3>
+                        <div class="score-badge" id="scoreBadge">
+                            <span id="scoreValue">0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="score-gauge">
+                        <svg class="gauge-svg" viewBox="0 0 200 120">
+                            <defs>
+                                <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#EF4444;stop-opacity:1" />
+                                    <stop offset="50%" style="stop-color:#F59E0B;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Background arc -->
+                            <path class="gauge-bg" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#1f2937" stroke-width="12" stroke-linecap="round"/>
+                            <!-- Progress arc -->
+                            <path id="gaugeProgress" class="gauge-progress" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="url(#gaugeGradient)" stroke-width="12" stroke-linecap="round"/>
+                            <!-- Needle -->
+                            <g id="gaugeNeedle" transform="rotate(0 100 100)">
+                                <circle cx="100" cy="100" r="8" fill="#8B5CF6"/>
+                                <line x1="100" y1="100" x2="100" y2="30" stroke="#8B5CF6" stroke-width="3" stroke-linecap="round"/>
+                            </g>
+                        </svg>
+                        <div class="gauge-labels">
+                            <span class="gauge-label-left">Low</span>
+                            <span class="gauge-label-right">High</span>
+                        </div>
+                    </div>
+
+                    <div class="score-interpretation" id="scoreInterpretation">
+                        <div class="interpretation-icon">ℹ️</div>
+                        <p id="interpretationText">Score indicates user quality and engagement level</p>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <img id="profilePfp" class="profile-pfp" src="" alt="Profile picture">
+                        <div class="profile-info">
+                            <h2 id="profileDisplayName" class="profile-name">Username</h2>
+                            <p id="profileUsername" class="profile-username">@username</p>
+                            <div class="profile-fid">
+                                <span class="fid-label">FID:</span>
+                                <span id="profileFid" class="fid-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-bio" id="profileBio">
+                        Bio will appear here
+                    </div>
+
+                    <div class="profile-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="followerCount">0</div>
+                            <div class="stat-label">Followers</div>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat">
+                            <div class="stat-value" id="followingCount">0</div>
+                            <div class="stat-label">Following</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Custody Address</span>
+                            <span id="custodyAddress" class="meta-value mono">0x...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Key Modal -->
+    <div class="modal" id="apiKeyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>API Configuration</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-description">Enter your Neynar API key to use this application. Get your API key from <a href="https://dev.neynar.com/" target="_blank" rel="noopener">dev.neynar.com</a></p>
+                <div class="input-group">
+                    <label for="apiKeyInput">API Key</label>
+                    <input type="password" id="apiKeyInput" placeholder="Enter your Neynar API key" autocomplete="off">
+                    <button class="toggle-visibility" id="toggleVisibility" type="button">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 7C8.34315 7 7 8.34315 7 10C7 11.6569 8.34315 13 10 13C11.6569 13 13 11.6569 13 10C13 8.34315 11.6569 7 10 7Z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M10 3C5 3 1.73 6.11 1 10C1.73 13.89 5 17 10 17C15 17 18.27 13.89 19 10C18.27 6.11 15 3 10 3Z" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="api-key-status" id="apiKeyStatus"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelBtn">Cancel</button>
+                <button class="btn-primary" id="saveApiKeyBtn">Save API Key</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
